@@ -1,0 +1,74 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Select test type to run'
+        required: true
+        default: 'functional'
+        type: choice
+        options:
+          - functional
+          - smoke
+          - performance
+
+jobs:
+  test:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set test type
+        id: test-type
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "type=${{ github.event.inputs.test_type }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        if: ${{ steps.test-type.outputs.type != 'performance' }}
+        run: npx playwright install --with-deps
+
+      - name: Run functional tests
+        if: ${{ steps.test-type.outputs.type == 'functional' }}
+        run: npx playwright test --project=functional
+
+      - name: Run smoke tests
+        if: ${{ steps.test-type.outputs.type == 'smoke' }}
+        run: npx playwright test --project=smoke
+
+      - name: Setup k6 for performance tests
+        if: ${{ steps.test-type.outputs.type == 'performance' }}
+        run: |
+          curl -fsSL https://github.com/grafana/k6/releases/download/v1.6.1/k6-v1.6.1-linux-amd64.tar.gz | tar -xzf -
+          sudo mv k6-v1.6.1-linux-amd64/k6 /usr/local/bin/k6
+
+      - name: Run performance tests
+        if: ${{ steps.test-type.outputs.type == 'performance' }}
+        run: |
+          npm run bundle
+          k6 run --duration 30s dist/users-performance-test.js
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ steps.test-type.outputs.type }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
