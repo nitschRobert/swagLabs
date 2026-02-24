@@ -17,6 +17,11 @@ on:
           - smoke
           - performance
 
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 jobs:
   smoke:
     if: github.event_name != 'workflow_dispatch' || github.event.inputs.test_type == 'smoke'
