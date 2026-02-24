@@ -41,7 +41,7 @@ jobs:
 
       - name: Install Playwright Browsers
         if: ${{ steps.test-type.outputs.type != 'performance' }}
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
 
       - name: Run functional tests
         if: ${{ steps.test-type.outputs.type == 'functional' }}
