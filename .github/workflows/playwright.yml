@@ -138,7 +138,7 @@ jobs:
       - name: Run performance tests
         run: |
           npm run bundle
-          k6 run --duration 30s dist/users-performance-test.js
+          k6 run dist/users-performance-test.js
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

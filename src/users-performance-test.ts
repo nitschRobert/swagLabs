@@ -8,7 +8,7 @@ export let options: Options = {
   scenarios: {
     users: {
       executor: 'constant-arrival-rate',
-      duration: '2m',
+      duration: '30s',
       rate: 100,
       timeUnit: '1s',
       preAllocatedVUs: 100,
