@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    tools { nodejs 'Node18' }  // Nazwa z konfiguracji
+    tools { nodejs 'Node' }  // Nazwa z konfiguracji
     stages {
         stage('Checkout') {
             steps { checkout scm }
