@@ -12,7 +12,7 @@ pipeline {
         }
         stage('Install browsers') {
             steps {
-                bat 'npx playwright install --with-deps'
+                bat 'npx playwright install --with-deps chromium'
             }
         }
         stage('Run tests') {
