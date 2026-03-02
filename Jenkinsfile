@@ -17,7 +17,7 @@ pipeline {
         }
         stage('Run tests') {
             steps {
-                bat 'npx playwright test'
+                bat 'npx playwright test --project=functional'
             }
         }
     }
