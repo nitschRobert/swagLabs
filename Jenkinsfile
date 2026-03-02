@@ -1,25 +1,31 @@
 pipeline {
     agent any
-    tools { nodejs 'Node' }  // Nazwa z konfiguracji
+    tools { nodejs 'Node' }
     stages {
         stage('Checkout') {
             steps { checkout scm }
         }
         stage('Install deps') {
-            steps { sh 'npm ci' }
+            steps {
+                bat 'npm ci'
+            }
         }
         stage('Install browsers') {
-            steps { sh 'npx playwright install --with-deps chromium' }
+            steps {
+                bat 'npx playwright install --with-deps'
+            }
         }
         stage('Run tests') {
-            steps { sh 'npx playwright test --project=functional' }
+            steps {
+                bat 'npx playwright test'
+            }
         }
     }
     post {
         always {
             archiveArtifacts artifacts: 'playwright-report/**, test-results/**', allowEmptyArchive: true
-            junit 'test-results/*.xml'
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Report'])
+            junit 'test-results/**/*.xml'
+            publishHTML([allowMissing: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Report'])
         }
     }
 }
